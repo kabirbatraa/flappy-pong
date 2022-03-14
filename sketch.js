@@ -1,27 +1,47 @@
 
 
 let p1top, p1bottom, p2top, p2bottom;
-let p1topf, p1bottomf, p2topf, p2bottomf;
+// let p1topf, p1bottomf, p2topf, p2bottomf;
 
 let ball;
 let ballVel;
-let xVel = 1.8;
+// let xVel = 1.8;
+let xVel;
 let ballRadius = 5;
 
 let gravity;
 
-let crossed = false;
+let crossed;
 
-let gameOver = false;
+let gameOver;
 
-let score = 0;
+let score;
 
-let leeway = 20;
+let leeway = 15;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
   noSmooth();
+
+  reset();
+ 
+
+  textAlign(CENTER, CENTER);
+
+
+  // ellipseMode(CENTER); // alr set i think
+  noStroke();
+}
+
+function reset() {
+  rectMode(CORNER);
+  crossed = false;
+  gameOver = false;
+  score = 0;
+
+  // make velocity with respect to screen size
+  xVel = 2 * width / 400; // resembles "speed = 2"
 
   ball = createVector(width/2, height/2);
   ballVel = createVector(xVel, 0);
@@ -31,15 +51,9 @@ function setup() {
   // p1top = p2top = 10;
   // p1bottom = p2bottom = height - 10;
   p1top = p2top = height/2 - 50;
-  p1topf = p2topf = height/2 - 50;
+  // p1topf = p2topf = height/2 - 50;
   p1bottom = p2bottom = height/2 + 50;
-  p1bottomf = p2bottomf = height/2 + 50;
-
-  textAlign(CENTER, CENTER);
-
-
-  // ellipseMode(CENTER); // alr set i think
-  noStroke();
+  // p1bottomf = p2bottomf = height/2 + 50;
 }
 
 function draw() {
@@ -66,7 +80,9 @@ function draw() {
     // ball hit left paddle  
     if (ball.x - ballRadius <= 50) {
       if (!crossed && p1top <= ball.y + leeway && ball.y - leeway <= p1bottom) {
-        xVel += 0.05;
+        // xVel += 0.05;
+        // if 2 is 1, then 0.05 is 0.025
+        xVel += width / 400 * 0.025;
         ballVel.x = xVel;
 
         // make right paddle smaller
@@ -90,7 +106,8 @@ function draw() {
     // ball hit right paddle
     if (ball.x + ballRadius >= width - 50) {
       if (!crossed && p2top <= ball.y + leeway && ball.y - leeway <= p2bottom) {
-        xVel += 0.05;
+        // xVel += 0.05;
+        xVel += width / 400 * 0.025;
         ballVel.x = -xVel;
 
         // make right paddle smaller
@@ -145,6 +162,11 @@ function draw() {
     text("game over", width/2, height/2);
     textSize(12);
     text("your score was " + score, width/2, height/2 + 40);
+    rectMode(CENTER);
+    rect(width/2, height/2 + 100, 100, 30, 20);
+    fill(0);
+    text("play again", width/2, height/2 + 100);
+
   }
   
 }
@@ -152,9 +174,23 @@ function draw() {
 
 function keyPressed() {
   ballVel.y = -6;
+  if (gameOver) {
+    if (keyCode == ENTER) {
+      reset();
+    }
+  }
 }
 
 function mousePressed() {
   ballVel.y = -6;
+
+  if (gameOver) {
+    if (
+      width/2 - 50 <= mouseX && mouseX <= width/2 + 50
+      && height/2+100 - 15 <= mouseY && mouseY <= height/2+100 + 15
+    ) {
+      reset();
+    }
+  }
 }
 
