@@ -1,7 +1,8 @@
 
 
 let p1top, p1bottom, p2top, p2bottom;
-// let p1topf, p1bottomf, p2topf, p2bottomf;
+let p1topOG, p1bottomOG, p2topOG, p2bottomOG;
+let p1topFinal, p1bottomFinal, p2topFinal, p2bottomFinal;
 
 let ball;
 let ballVel;
@@ -18,6 +19,14 @@ let gameOver;
 let score;
 
 let leeway = 15;
+
+let terminalVelocity = 50;
+
+// frames for animating paddles
+let totalFrames = 30;
+let framesLeft = 0;
+let p1needsToMove = false;
+let p2needsToMove = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -51,8 +60,13 @@ function reset() {
   // p1top = p2top = 10;
   // p1bottom = p2bottom = height - 10;
   p1top = p2top = height/2 - 50;
+  p1topOG = p2topOG = height/2 - 50;
+  p1topFinal = p2topFinal = height/2 - 50;
+
   // p1topf = p2topf = height/2 - 50;
   p1bottom = p2bottom = height/2 + 50;
+  p1bottomOG = p2bottomOG = height/2 + 50;
+  p1bottomFinal = p2bottomFinal = height/2 + 50;
   // p1bottomf = p2bottomf = height/2 + 50;
 }
 
@@ -88,8 +102,15 @@ function draw() {
         // make right paddle smaller
         let totalSize = p1bottom - p1top;
         totalSize = 0.8 * totalSize;
-        p1top = random(0, height - totalSize);
-        p1bottom = p1top + totalSize;
+
+        // p1top = random(0, height - totalSize);
+        // p1bottom = p1top + totalSize;
+        p1topFinal = random(0, height - totalSize);
+        p1bottomFinal = p1topFinal + totalSize;
+        p1topOG = p1top;
+        p1bottomOG = p1bottom;
+        p1needsToMove = true;
+        framesLeft = totalFrames;
         
         score++;
       }
@@ -113,8 +134,14 @@ function draw() {
         // make right paddle smaller
         let totalSize = p2bottom - p2top;
         totalSize = 0.8 * totalSize;
-        p2top = random(0, height - totalSize);
-        p2bottom = p2top + totalSize;
+        // p2top = random(0, height - totalSize);
+        // p2bottom = p2top + totalSize;
+        p2topFinal = random(0, height - totalSize);
+        p2bottomFinal = p2topFinal + totalSize;
+        p2topOG = p2top;
+        p2bottomOG = p2bottom;
+        p2needsToMove = true;
+        framesLeft = totalFrames;
         
         score++;
       }
@@ -129,30 +156,26 @@ function draw() {
       gameOver = true;
     }
 
+    // hit floor:
+    if (ball.y > height) {
+      ball.y = 0;
+    }
+
+    // hit roof:
+    if (ball.y < 0) {
+      ball.y = height;
+    }
 
     // update everything
     ballVel.add(gravity);
+
+    if (ballVel.y > terminalVelocity) {
+      ballVel.y = terminalVelocity;
+    }
+
     ball.add(ballVel);
 
-    // animate movement of paddles
-    // if (p1bottom != p1bottomf) {
-    //   if (p1bottom > p1bottomf) {
-    //     if (p1bottom - p1bottomf < 1) {
-    //       p1bottom = p1bottomf;
-    //     }
-    //     else {
-    //       p1bottom--;
-    //     }
-    //   }
-    //   else { // p1bottom < p1bottomf
-    //     if (p1bottomf - p1bottom < 1) {
-    //       p1bottom = p1bottomf;
-    //     }
-    //     else {
-    //       p1bottom++;
-    //     }
-    //   }
-    // }
+    movePaddles();
 
   }
   else { // game is over
@@ -170,6 +193,62 @@ function draw() {
   }
   
 }
+
+
+function movePaddles() {
+  //p1needsToMove, p2needsToMove
+
+  // p1topFinal, p1bottomFinal
+  // framesLeft 100 --> 0
+  // totalFrames
+  // create function based on relationship between totalFrames and frames left
+  // f(framesLeft / totalFrames) --> if 1, then no movement, if 1 -> 0.5, then increase speed
+  // if 0.5 -> 1, then decrease speed 
+  // speed should actually be positioning based on the distance between current p1 and final
+  // p1pos = p1final * (how far we should be, from 0 to 1.0)
+
+  // lets try linear motion first
+  // p1top = map((framesLeft / totalFrames), 1, 0, p1topOG, p1topFinal);
+
+  // how can we replace (framesLeft / totalFrames) to make it nonlinear?
+  // (framesLeft / totalFrames) goes from 1 to 0 linearly
+  // some x goes from 1 to 0.5 at increasing slope and then 
+  // from 0.5 to 0 at decreasing slope
+  // this reminds me of a gaussian curve?
+  // something to do with e^ (1 / x)
+  // might need to look it up if i cant figure it out on the plane
+
+  if (p1needsToMove) {
+
+    if (framesLeft == 0) {
+      p1top = p1topFinal;
+      p1bottom = p1bottomFinal;
+      p1needsToMove = false;
+    }
+    else {
+      p1top = map((framesLeft / totalFrames), 1, 0, p1topOG, p1topFinal);
+      p1bottom = map((framesLeft / totalFrames), 1, 0, p1bottomOG, p1bottomFinal);
+      framesLeft--;
+    }
+    
+  }
+
+  if (p2needsToMove) {
+
+    if (framesLeft == 0) {
+      p2top = p2topFinal;
+      p2bottom = p2bottomFinal;
+      p2needsToMove = false;
+    }
+    else {
+      p2top = map((framesLeft / totalFrames), 1, 0, p2topOG, p2topFinal);
+      p2bottom = map((framesLeft / totalFrames), 1, 0, p2bottomOG, p2bottomFinal);
+      framesLeft--;
+    }
+    
+  }
+}
+
 
 
 function keyPressed() {
