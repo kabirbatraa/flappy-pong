@@ -218,18 +218,36 @@ function movePaddles() {
   // something to do with e^ (1 / x)
   // might need to look it up if i cant figure it out on the plane
 
+  // i could also just do a regular polynomial function with 
+  // local min at 0,0 
+  // local max at 1,1
+  // even better, a stepwise function that is 
+  // x^2 from 0 to 0.5, and then -x^2 + 1 from 0.5 to 1
+  // with proper connection ofc.. something like that
+
+  // 2x^2 and -2(x-1)^2 + 1 WORK
+  // if framesLeft > 0.5 * totalFrames
+
   if (p1needsToMove) {
 
     if (framesLeft == 0) {
       p1top = p1topFinal;
       p1bottom = p1bottomFinal;
       p1needsToMove = false;
+      return;
+    }
+    let functionX, functionY;
+    if (framesLeft > 0.5 * totalFrames) {
+      functionX = (1 - (framesLeft / totalFrames));
+      functionY = 2 * functionX * functionX;
     }
     else {
-      p1top = map((framesLeft / totalFrames), 1, 0, p1topOG, p1topFinal);
-      p1bottom = map((framesLeft / totalFrames), 1, 0, p1bottomOG, p1bottomFinal);
-      framesLeft--;
+      functionX = (1 - (framesLeft / totalFrames));
+      functionY = -2 * (functionX - 1) * (functionX - 1) + 1;
     }
+    p1top = p1topOG + (p1topFinal - p1topOG) * functionY;
+    p1bottom = p1bottomOG + (p1bottomFinal - p1bottomOG) * functionY;
+    framesLeft--;
     
   }
 
@@ -239,12 +257,35 @@ function movePaddles() {
       p2top = p2topFinal;
       p2bottom = p2bottomFinal;
       p2needsToMove = false;
+      return;
+    }
+
+    let functionX, functionY;
+
+    if (framesLeft > 0.5 * totalFrames) {
+      // start = p2topOG (represents 0 in graph)
+      // end = p2topFinal (represents 1 in graph)
+      // set pos to start + (end - start) * how far we are (approaching 0 if we are closer)
+      // how far we are but approaching 0 = (framesLeft / totalFrames)
+
+      functionX = (1 - (framesLeft / totalFrames));
+      functionY = 2 * functionX * functionX;
     }
     else {
-      p2top = map((framesLeft / totalFrames), 1, 0, p2topOG, p2topFinal);
-      p2bottom = map((framesLeft / totalFrames), 1, 0, p2bottomOG, p2bottomFinal);
-      framesLeft--;
+      functionX = (1 - (framesLeft / totalFrames));
+      functionY = -2 * (functionX - 1) * (functionX - 1) + 1;
     }
+    p2top = p2topOG + (p2topFinal - p2topOG) * functionY;
+    // p2top = map((framesLeft / totalFrames), 1, 0, p2topOG, p2topFinal);
+    // p2bottom = map((framesLeft / totalFrames), 1, 0, p2bottomOG, p2bottomFinal);
+    p2bottom = p2bottomOG + (p2bottomFinal - p2bottomOG) * functionY;
+    framesLeft--;
+    
+    // else {
+    //   p2top = map((framesLeft / totalFrames), 1, 0, p2topOG, p2topFinal);
+    //   p2bottom = map((framesLeft / totalFrames), 1, 0, p2bottomOG, p2bottomFinal);
+    //   framesLeft--;
+    // }
     
   }
 }
