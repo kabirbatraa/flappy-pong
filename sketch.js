@@ -75,7 +75,7 @@ function draw() {
 
   if (!gameOver && !mainScreen) {
 
-    background(0);
+    background(0, 100);
     textSize(15);
     fill(255);
     text("score: " + score, width/2, 30);
