@@ -14,7 +14,7 @@ let gravity;
 
 let crossed;
 
-let gameOver;
+let gameOver, mainScreen;
 
 let score;
 
@@ -34,7 +34,7 @@ function setup() {
   noSmooth();
 
   reset();
- 
+
 
   textAlign(CENTER, CENTER);
 
@@ -47,6 +47,7 @@ function reset() {
   rectMode(CORNER);
   crossed = false;
   gameOver = false;
+  mainScreen = true;
   score = 0;
 
   // make velocity with respect to screen size
@@ -72,7 +73,7 @@ function reset() {
 
 function draw() {
 
-  if (!gameOver) {
+  if (!gameOver && !mainScreen) {
 
     background(0);
     textSize(15);
@@ -177,6 +178,18 @@ function draw() {
 
     movePaddles();
 
+  }
+  else if (mainScreen) {
+    background(0, 20);
+    textSize(20);
+    fill(255);
+    text("flappy pong", width/2, height/2);
+    textSize(12);
+    text("tap or click to jump. hit the paddles to get points", width/2, height/2 + 40);
+    rectMode(CENTER);
+    rect(width/2, height/2 + 100, 100, 30, 20);
+    fill(0);
+    text("play", width/2, height/2 + 100);
   }
   else { // game is over
     background(0, 20);
@@ -304,12 +317,14 @@ function keyPressed() {
 function mousePressed() {
   ballVel.y = -6;
 
-  if (gameOver) {
+  if (gameOver || mainScreen) {
     if (
       width/2 - 50 <= mouseX && mouseX <= width/2 + 50
       && height/2+100 - 15 <= mouseY && mouseY <= height/2+100 + 15
     ) {
-      reset();
+      if (gameOver)
+        reset();
+      else if (mainScreen) mainScreen = false;
     }
   }
 }
