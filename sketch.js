@@ -320,7 +320,19 @@ function keyPressed() {
   // }
 }
 
+function touchStarted(event) {
+  console.log("touch started");
+  
+  unifiedMouseOrTap();
+}
+
 function mousePressed() {
+  console.log("mouse pressed");
+
+  unifiedMouseOrTap();
+}
+
+function unifiedMouseOrTap() {
 
   if (currentScene == PLAYING)
     ballVel.y = -6;
@@ -337,4 +349,5 @@ function mousePressed() {
       reset(); // start playing game (current scene = playing)
     }
   }
+
 }
