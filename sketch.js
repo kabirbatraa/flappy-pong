@@ -14,7 +14,10 @@ let gravity;
 
 let crossed;
 
-let gameOver, mainScreen;
+let currentScene;
+const MAIN_SCREEN = 1;
+const GAME_OVER = 2;
+const PLAYING = 3;
 
 let score;
 
@@ -33,7 +36,10 @@ function setup() {
 
   noSmooth();
 
-  reset();
+  // reset();
+  currentScene = MAIN_SCREEN;
+  // scene = main screen --> button --> reset aka set up for game --> scene = playing
+  // fail --> scene = game over --> button --> scene = main screen, no reset yet
 
 
   textAlign(CENTER, CENTER);
@@ -46,8 +52,7 @@ function setup() {
 function reset() {
   rectMode(CORNER);
   crossed = false;
-  gameOver = false;
-  mainScreen = true;
+  currentScene = PLAYING;
   score = 0;
 
   // make velocity with respect to screen size
@@ -73,7 +78,7 @@ function reset() {
 
 function draw() {
 
-  if (!gameOver && !mainScreen) {
+  if (currentScene == PLAYING) {
 
     background(0, 100);
     textSize(15);
@@ -122,7 +127,7 @@ function draw() {
 
     // hit right edge
     if (ball.x - ballRadius <= 0) {
-      gameOver = true;
+      currentScene = GAME_OVER;
     }
 
     // ball hit right paddle
@@ -154,7 +159,7 @@ function draw() {
 
     // hit left edge
     if (ball.x + ballRadius >= width) {
-      gameOver = true;
+      currentScene = GAME_OVER;
     }
 
     // hit floor:
@@ -179,7 +184,7 @@ function draw() {
     movePaddles();
 
   }
-  else if (mainScreen) {
+  else if (currentScene == MAIN_SCREEN) {
     background(0, 20);
     textSize(20);
     fill(255);
@@ -306,29 +311,30 @@ function movePaddles() {
 
 
 function keyPressed() {
-  ballVel.y = -6;
-  if (gameOver) {
-    if (keyCode == ENTER) {
-      reset();
-    }
-  }
+  if (currentScene == PLAYING)
+    ballVel.y = -6;
+  // if (gameOver) {
+  //   if (keyCode == ENTER) {
+  //     reset();
+  //   }
+  // }
 }
 
 function mousePressed() {
-  ballVel.y = -6;
+
+  if (currentScene == PLAYING)
+    ballVel.y = -6;
 
   // if click on button
   if (
     width/2 - 50 <= mouseX && mouseX <= width/2 + 50
     && height/2+100 - 15 <= mouseY && mouseY <= height/2+100 + 15
   ) {
-    if (gameOver) {
-      reset();
+    if (currentScene == GAME_OVER) {
+      currentScene = MAIN_SCREEN;
     }
-    else if (mainScreen) {
-      mainScreen = false;
+    else if (currentScene == MAIN_SCREEN) {
+      reset(); // start playing game (current scene = playing)
     }
   }
-
 }
-
