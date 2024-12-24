@@ -317,15 +317,18 @@ function keyPressed() {
 function mousePressed() {
   ballVel.y = -6;
 
-  if (gameOver || mainScreen) {
-    if (
-      width/2 - 50 <= mouseX && mouseX <= width/2 + 50
-      && height/2+100 - 15 <= mouseY && mouseY <= height/2+100 + 15
-    ) {
-      if (gameOver)
-        reset();
-      else if (mainScreen) mainScreen = false;
+  // if click on button
+  if (
+    width/2 - 50 <= mouseX && mouseX <= width/2 + 50
+    && height/2+100 - 15 <= mouseY && mouseY <= height/2+100 + 15
+  ) {
+    if (gameOver) {
+      reset();
+    }
+    else if (mainScreen) {
+      mainScreen = false;
     }
   }
+
 }
 
